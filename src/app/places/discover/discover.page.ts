@@ -12,6 +12,11 @@ export class DiscoverPage implements OnInit {
 
   constructor(private placesSrv: PlacesService) { }
 
+  onFilterUpdate(event: CustomEvent) {
+    console.log(event.detail);
+    
+  }
+
   ngOnInit() {
     this.loadedPlaces = this.placesSrv.places;
   }
