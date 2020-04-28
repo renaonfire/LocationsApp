@@ -12,11 +12,6 @@ export class NewOfferPage implements OnInit {
 
   constructor() { }
 
-  onCreateOffer() {
-    console.log(this.form);
-    
-  }
-
   ngOnInit() {
     this.form = new FormGroup({
       title: new FormControl(null, {
@@ -40,6 +35,14 @@ export class NewOfferPage implements OnInit {
         validators: [Validators.required]
       })
     });
+  }
+
+  onCreateOffer() {
+    if (!this.form.valid) {
+      return;
+    }
+    console.log(this.form);
+    
   }
 
 }

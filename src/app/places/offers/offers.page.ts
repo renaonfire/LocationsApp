@@ -17,8 +17,8 @@ export class OffersPage implements OnInit {
   constructor(private placesSrv: PlacesService, private router: Router) { }
 
   onEdit(offerId: string, slidingItem: IonItemSliding) {
-    slidingItem.close();
     this.router.navigateByUrl('/places/tabs/offers/edit/' + offerId);
+    slidingItem.close();
   }
 
   ngOnInit() {

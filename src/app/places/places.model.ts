@@ -3,6 +3,8 @@ export class Places {
                 public title: string, 
                 public description: string, 
                 public img: string, 
-                public price: number
+                public price: number,
+                public availableFrom: Date,
+                public availableTo: Date
                 ) {}
 }
