@@ -1,34 +1,58 @@
 import { Injectable } from '@angular/core';
 import { Places } from './places.model';
+import { AuthService } from '../auth/auth.service';
+import { BehaviorSubject } from 'rxjs';
+import { take, map } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
 })
 export class PlacesService {
-  private _places: Places[] = [
+  private _places = new BehaviorSubject<Places[]>([
     new Places('p1', 
       'New York', 
       'Description', 
       'https://images.unsplash.com/photo-1534430480872-3498386e7856?ixlib=rb-1.2.1&w=1000&q=80', 
       450,
       new Date('2019-01-01'),
-      new Date('2019-12-31')),
+      new Date('2019-12-31'),
+      'abc'),
     new Places('p2', 
       'France', 
       'Romance is in the air', 
       'https://cropper.watch.aetnd.com/cdn.watch.aetnd.com/sites/2/2018/05/hith-eiffel-tower-iStock_000016468972Large.jpg', 
       600,
       new Date('2019-01-01'),
-      new Date('2019-12-31'))
-  ];
+      new Date('2019-12-31'),
+      'bca')
+  ]) 
 
   get places() {
-    return [...this._places];
+    return this._places.asObservable();
   }
 
-  constructor() { }
+  constructor(private authSrv: AuthService) { }
 
   getPlace(id: string) {
-    return {...this._places.find(p => p.id === id)}
+    return this.places.pipe(take(1), map(places => {
+      return {...places.find(p => p.id === id)}
+    }))
+  }
+
+  addPlace(title: string, description: string, price: number, dateFrom: Date, dateTo: Date) {
+    const newPlace = new Places(Math.random().toString(), 
+      title, 
+      description, 
+      'img', 
+      price, 
+      dateFrom, 
+      dateTo, 
+      this.authSrv.userId
+      );
+      this.places.pipe(take(1)).subscribe((places) => {
+        this._places.next(places.concat(newPlace));
+      });
+      
+      
   }
 }
