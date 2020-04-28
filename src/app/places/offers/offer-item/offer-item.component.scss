@@ -1,0 +1,17 @@
+h2 {
+    font-size: 16px;
+    font-weight: 600;
+    border: 1px solid var(--ion-color-primary);
+    padding: 8px;
+    border-radius: 5px;
+    color: var(--ion-color-primary);
+}
+
+.offer-details {
+    align-items: center;
+
+    .space-left {
+        margin-left: 5px;
+    }
+}
+

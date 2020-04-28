@@ -5,7 +5,7 @@
     </ion-buttons>
     <ion-title>My Offers</ion-title>
     <ion-buttons slot="primary">
-      <ion-button routerLink="/places/offers/new">
+      <ion-button routerLink="/places/tabs/offers/new">
         <ion-icon name="add" slot="icon-only"></ion-icon>
       </ion-button>
     </ion-buttons>
@@ -18,17 +18,7 @@
       <ion-col>
         <ion-list>
           <ion-item-sliding *ngFor="let offer of offers" #slidingItem>
-            <ion-item 
-            [routerLink]="['/', 'places', 'offers', offer.id]"
-            detail>
-            <ion-thumbnail slot="start">
-              <ion-img></ion-img>
-            </ion-thumbnail>
-            <ion-label>
-              <h2>{{ offer.title }}</h2>
-              <p>{{ offer.description }}</p>
-            </ion-label>
-          </ion-item>
+            <app-offer-item [offer]="offer"></app-offer-item>
           <ion-item-options>
             <ion-item-option (click)="onEdit(offer.id, slidingItem)">
               <ion-icon name="create" slot="icon-only"></ion-icon>
