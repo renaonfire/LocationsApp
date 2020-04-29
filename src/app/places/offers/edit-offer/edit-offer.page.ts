@@ -1,8 +1,8 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Places } from '../../places.model';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { PlacesService } from '../../places.service';
-import { NavController } from '@ionic/angular';
+import { NavController, LoadingController } from '@ionic/angular';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { Subscription } from 'rxjs';
 
@@ -17,20 +17,30 @@ export class EditOfferPage implements OnInit, OnDestroy {
   form: FormGroup;
   private placeSub: Subscription;
 
-  constructor( private route: ActivatedRoute, private placesSrv: PlacesService, private navCtrl: NavController) { }
+  constructor( private route: ActivatedRoute, private placesSrv: PlacesService, private navCtrl: NavController, private router: Router, private loadingCtrl: LoadingController) { }
 
   onUpdateOffer() {
     if(!this.form.valid) {
       return;
     }
-    console.log(this.form);
-    
+    this.loadingCtrl.create({
+      message: 'Updating Place...'
+    }).then(loadingEl => {
+      loadingEl.present();
+      this.placesSrv.updatePlace(this.place.id, this.form.value.title, 
+        this.form.value.description
+        ).subscribe(() => {
+          loadingEl.dismiss();
+          this.form.reset();
+          this.router.navigateByUrl('/places/tabs/offers')
+        });
+    }) 
   }
 
   ngOnInit() {
     this.route.paramMap.subscribe(paramMap => {
       if (!paramMap.has('placeId')) {
-        this.navCtrl.navigateBack('places/offers');
+        this.navCtrl.navigateBack('places/tabs/offers');
         return;
       }
       this.placeSub = this.placesSrv.getPlace(paramMap.get('placeId')).subscribe(place => {
@@ -41,6 +51,15 @@ export class EditOfferPage implements OnInit, OnDestroy {
             validators: [Validators.maxLength(40)]
           }), 
           description: new FormControl(this.place.description, {
+            updateOn: 'blur'
+          }), 
+          price: new FormControl(this.place.price, {
+            updateOn: 'blur'
+          }),
+          dateFrom: new FormControl(this.place.availableFrom.toISOString(), {
+            updateOn: 'blur'
+          }),
+          dateTo: new FormControl(this.place.availableTo.toISOString(), {
             updateOn: 'blur'
           })
         })

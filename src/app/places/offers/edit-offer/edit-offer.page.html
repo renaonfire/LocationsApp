@@ -31,6 +31,28 @@
         </ion-item>
       </ion-col>
     </ion-row>
+    <ion-row>
+      <ion-col size-sm="6" offset-sm="3">
+        <ion-item>
+          <ion-label position="floating">Price</ion-label>
+          <ion-input formControlName="price" type="number"></ion-input>
+        </ion-item>
+      </ion-col>
+    </ion-row>
+    <ion-row>
+      <ion-col size-sm="3" offset-sm="3">
+        <ion-item>
+          <ion-label position="floating">Available From</ion-label>
+          <ion-datetime formControlName="dateFrom" min="2019-01-01" max="2025-12-31"></ion-datetime>
+        </ion-item>
+      </ion-col>
+      <ion-col size-sm="3">
+        <ion-item>
+          <ion-label position="floating">Available To</ion-label>
+          <ion-datetime formControlName="dateTo" min="2019-01-02" max="2025-12-31"></ion-datetime>
+        </ion-item>
+      </ion-col>
+    </ion-row>
   </ion-grid>
 </form>
 </ion-content>
