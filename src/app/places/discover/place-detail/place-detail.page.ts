@@ -1,10 +1,11 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { NavController, ModalController, ActionSheetController } from '@ionic/angular';
+import { NavController, ModalController, ActionSheetController, LoadingController } from '@ionic/angular';
 import { Places } from '../../places.model';
 import { PlacesService } from '../../places.service';
 import { CreateBookingComponent } from 'src/app/bookings/create-booking/create-booking.component';
 import { Subscription } from 'rxjs';
+import { BookingsService } from 'src/app/bookings/bookings.service';
 
 @Component({
   selector: 'app-place-detail',
@@ -20,7 +21,10 @@ export class PlaceDetailPage implements OnInit, OnDestroy {
     private navCtrl: NavController, 
     private placesSrv: PlacesService, 
     private modalCtrl: ModalController,
-    private actionSheetCtrl: ActionSheetController) { }
+    private actionSheetCtrl: ActionSheetController,
+    private bookingSrv: BookingsService,
+    private loadingCtrl: LoadingController
+    ) { }
     
     onBookPlace() {
       this.actionSheetCtrl.create({
@@ -56,7 +60,23 @@ export class PlaceDetailPage implements OnInit, OnDestroy {
         modalEl.present();
         return modalEl.onDidDismiss();
       }).then(resultData => {
-        console.log(resultData.data);
+        this.loadingCtrl.create({
+          message: 'Booking Place...'
+        }).then(loadingEl => {
+          loadingEl.present();
+          let bookingData = resultData.data.bookingData;
+          this.bookingSrv.addBooking(
+            this.place.id, 
+            this.place.title, 
+            bookingData.guestNumber, 
+            bookingData.firstName, 
+            bookingData.lastName, 
+            bookingData.startDate, 
+            bookingData.endDate
+            ).subscribe(() => {
+              loadingEl.dismiss();
+            })
+        })
       })
     }
 
