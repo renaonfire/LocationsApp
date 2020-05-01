@@ -1,6 +1,6 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
-import { NavController, ModalController, ActionSheetController, LoadingController } from '@ionic/angular';
+import { ActivatedRoute, Router } from '@angular/router';
+import { NavController, ModalController, ActionSheetController, LoadingController, AlertController } from '@ionic/angular';
 import { Places } from '../../places.model';
 import { PlacesService } from '../../places.service';
 import { CreateBookingComponent } from 'src/app/bookings/create-booking/create-booking.component';
@@ -17,6 +17,7 @@ export class PlaceDetailPage implements OnInit, OnDestroy {
 
   place: Places
   isBookable = false;
+  isLoading = false;
   private placeSub: Subscription;
 
   constructor(private route: ActivatedRoute, 
@@ -26,7 +27,9 @@ export class PlaceDetailPage implements OnInit, OnDestroy {
     private actionSheetCtrl: ActionSheetController,
     private bookingSrv: BookingsService,
     private loadingCtrl: LoadingController,
-    private authSrv: AuthService
+    private authSrv: AuthService,
+    private alertCtrl: AlertController,
+    private router: Router
     ) { }
     
     onBookPlace() {
@@ -89,10 +92,22 @@ export class PlaceDetailPage implements OnInit, OnDestroy {
         this.navCtrl.navigateBack('places/discover');
         return;
       }
+      this.isLoading = true;
       this.placeSub = this.placesSrv.getPlace(paramMap.get('placeId')).subscribe(place => {
+        this.isLoading = false;
         this.place = place;
         this.isBookable = place.userId !== this.authSrv.userId;
-      });
+      }, error => {
+        this.alertCtrl.create({
+          header: 'Whoops',
+          message: 'Something went wrong',
+          buttons: [{text: 'Okay', handler: () => {
+            this.router.navigateByUrl('/places/tabs/discover');
+          }}]
+        }).then(alertEl => {
+          alertEl.present();
+        })
+      })
     });
   }
 
