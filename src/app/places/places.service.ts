@@ -5,34 +5,52 @@ import { BehaviorSubject } from 'rxjs';
 import { take, map, tap, delay, switchMap } from 'rxjs/operators';
 import { HttpClient } from '@angular/common/http';
 
+interface PlaceData {
+  availableFrom: string;
+  availableTo: string;
+  description: string;
+  img: string;
+  price: number;
+  title: string;
+  userId: string;
+}
+
 @Injectable({
   providedIn: 'root'
 })
 export class PlacesService {
-  private _places = new BehaviorSubject<Places[]>([
-    new Places('p1', 
-      'New York', 
-      'Description', 
-      'https://images.unsplash.com/photo-1534430480872-3498386e7856?ixlib=rb-1.2.1&w=1000&q=80', 
-      450,
-      new Date('2019-01-01'),
-      new Date('2019-12-31'),
-      'abc'),
-    new Places('p2', 
-      'France', 
-      'Romance is in the air', 
-      'https://cropper.watch.aetnd.com/cdn.watch.aetnd.com/sites/2/2018/05/hith-eiffel-tower-iStock_000016468972Large.jpg', 
-      600,
-      new Date('2019-01-01'),
-      new Date('2019-12-31'),
-      'bca')
-  ]) 
+  private _places = new BehaviorSubject<Places[]>([]) 
 
   get places() {
     return this._places.asObservable();
   }
 
   constructor(private authSrv: AuthService, private http: HttpClient) { }
+
+  fetchPlaces() {
+    return this.http.get<{[key: string]: PlaceData}>('https://locationsapp-73201.firebaseio.com/offered-places.json')
+    .pipe(map(resData => {
+      const places = [];
+      for (const key in resData) {
+        if (resData.hasOwnProperty(key)) {
+          places.push(new Places(
+            key, 
+            resData[key].title, 
+            resData[key].description, 
+            resData[key].img, 
+            resData[key].price, 
+            new Date(resData[key].availableFrom), 
+            new Date(resData[key].availableTo), 
+            resData[key].userId))
+        }
+      }
+      return places;
+    }),
+    tap(places => {
+      this._places.next(places);
+    })
+    );
+  }
 
   getPlace(id: string) {
     return this.places.pipe(take(1), map(places => {
@@ -70,11 +88,10 @@ export class PlacesService {
   }
 
   updatePlace(placeId: string, title: string, description: string) {
-    return this.places.pipe(take(1), 
-    delay(1000), 
-    tap(places => {
+    let updatedPlaces: Places[];
+    return this.places.pipe(take(1), switchMap(places => {
       const updatedPlaceIndex = places.findIndex(pl => pl.id === placeId);
-      const updatedPlaces = [...places];
+      updatedPlaces = [...places];
       const oldPlace = updatedPlaces[updatedPlaceIndex];
       updatedPlaces[updatedPlaceIndex] = new Places(oldPlace.id, 
           title, 
@@ -85,7 +102,11 @@ export class PlacesService {
           oldPlace.availableTo, 
           oldPlace.userId
           );
-          this._places.next(updatedPlaces);
-    }))
+          return this.http.put(`https://locationsapp-73201.firebaseio.com/offered-places/${placeId}.json`, 
+          { ...updatedPlaces[updatedPlaceIndex], id: null }
+          );
+    }), tap(() => {
+      this._places.next(updatedPlaces);
+    }));
   }
 }

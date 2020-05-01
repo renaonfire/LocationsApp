@@ -17,7 +17,7 @@ export class PlaceBookingsPage implements OnInit, OnDestroy {
   constructor(private route: ActivatedRoute, private navCtrl: NavController, private placesSrv: PlacesService, private router: Router) { }
 
   onEdit() {
-    this.router.navigateByUrl('/places/offers/edit/' + this.place.id);
+    this.router.navigateByUrl('/places/tabs/offers/edit/' + this.place.id);
   }
 
   ngOnInit() {
