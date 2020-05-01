@@ -32,7 +32,7 @@ export class BookingsService {
     
 
     fetchBookings() {
-        return this.http.get<{[key: string]: BookingData}>('https://locationsapp-73201.firebaseio.com/bookings.json')
+        return this.http.get<{[key: string]: BookingData}>(`https://locationsapp-73201.firebaseio.com/bookings.json?orderBy="userId"&equalTo="${this.authSrv.userId}"`)
         .pipe(map(resData => {
         const bookings = [];
         for (const key in resData) {
@@ -86,10 +86,14 @@ export class BookingsService {
     }
 
     cancelBooking(bookingId: string) {
-        return this.bookings.pipe(take(1),
-        delay(1000),
+        return this.http.delete(`https://locationsapp-73201.firebaseio.com/bookings/${bookingId}.json`)
+        .pipe(switchMap(() => {
+            // gives the bookings list we have locally not on the server
+            return this.bookings;
+        }), 
+        take(1),
         tap(bookings => {
-            this._bookings.next(bookings.filter(b => b.bookingId !== bookingId))
-        }))
+            this._bookings.next(bookings.filter(b => b.bookingId !== bookingId));
+        }));
     }
 }
