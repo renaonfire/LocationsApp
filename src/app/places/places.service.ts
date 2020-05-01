@@ -58,13 +58,13 @@ export class PlacesService {
     }))
   }
 
-  addPlace(title: string, description: string, price: number, dateFrom: Date, dateTo: Date) {
+  addPlace(title: string, description: string, price: number, dateFrom: Date, dateTo: Date, img?: string) {
     let generatedId: string;
     const newPlace = new Places(
       Math.random().toString(), 
       title, 
       description, 
-      'img', 
+      img, 
       price, 
       dateFrom, 
       dateTo, 
@@ -87,7 +87,7 @@ export class PlacesService {
       // }));
   }
 
-  updatePlace(placeId: string, title: string, description: string) {
+  updatePlace(placeId: string, title: string, description: string, img: string) {
     let updatedPlaces: Places[];
     return this.places.pipe(take(1), switchMap(places => {
       const updatedPlaceIndex = places.findIndex(pl => pl.id === placeId);
@@ -96,7 +96,7 @@ export class PlacesService {
       updatedPlaces[updatedPlaceIndex] = new Places(oldPlace.id, 
           title, 
           description, 
-          oldPlace.img, 
+          img, 
           oldPlace.price, 
           oldPlace.availableFrom, 
           oldPlace.availableTo, 

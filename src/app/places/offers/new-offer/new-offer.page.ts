@@ -36,6 +36,9 @@ export class NewOfferPage implements OnInit {
       dateTo: new FormControl(null, {
         updateOn: 'blur',
         validators: [Validators.required]
+      }),
+      img: new FormControl(null, {
+        updateOn: 'blur'
       })
     });
   }
@@ -48,11 +51,13 @@ export class NewOfferPage implements OnInit {
       message: 'Creating place...'
     }).then(loadingEL => {
       loadingEL.present();
-      this.placesSrv.addPlace(this.form.value.title, 
+      this.placesSrv.addPlace(
+        this.form.value.title, 
         this.form.value.description,
         +this.form.value.price,
         new Date(this.form.value.dateFrom),
-        new Date(this.form.value.dateTo)
+        new Date(this.form.value.dateTo),
+        this.form.value.img
         ).subscribe(() => {
           loadingEL.dismiss();
           this.form.reset();

@@ -27,8 +27,11 @@ export class EditOfferPage implements OnInit, OnDestroy {
       message: 'Updating Place...'
     }).then(loadingEl => {
       loadingEl.present();
-      this.placesSrv.updatePlace(this.place.id, this.form.value.title, 
-        this.form.value.description
+      this.placesSrv.updatePlace(
+        this.place.id, 
+        this.form.value.title, 
+        this.form.value.description, 
+        this.form.value.img
         ).subscribe(() => {
           loadingEl.dismiss();
           this.form.reset();
@@ -60,6 +63,9 @@ export class EditOfferPage implements OnInit, OnDestroy {
             updateOn: 'blur'
           }),
           dateTo: new FormControl(this.place.availableTo.toISOString(), {
+            updateOn: 'blur'
+          }),
+          img: new FormControl(this.place.img, {
             updateOn: 'blur'
           })
         })
