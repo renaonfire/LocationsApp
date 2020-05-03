@@ -3,6 +3,7 @@ import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { PlacesService } from '../../places.service';
 import { Router } from '@angular/router';
 import { LoadingController } from '@ionic/angular';
+import { PlaceLocation } from '../../location.model';
 
 @Component({
   selector: 'app-new-offer',
@@ -23,7 +24,7 @@ export class NewOfferPage implements OnInit {
       }), 
       description: new FormControl(null, {
         updateOn: 'blur',
-        validators: [Validators.required, Validators.maxLength(180)]
+        validators: [Validators.required]
       }),
       price: new FormControl(null, {
         updateOn: 'blur',
@@ -39,13 +40,16 @@ export class NewOfferPage implements OnInit {
       }),
       img: new FormControl(null, {
         updateOn: 'blur'
+      }),
+      location: new FormControl(null, {
+        validators: [Validators.required]
       })
     });
   }
 
   onCreateOffer() {
     if (!this.form.valid) {
-      return;
+      console.log(this.form);
     }
     this.loadingCtrl.create({
       message: 'Creating place...'
@@ -57,13 +61,18 @@ export class NewOfferPage implements OnInit {
         +this.form.value.price,
         new Date(this.form.value.dateFrom),
         new Date(this.form.value.dateTo),
-        this.form.value.img
+        this.form.value.img,
+        this.form.value.location
         ).subscribe(() => {
           loadingEL.dismiss();
           this.form.reset();
           this.router.navigateByUrl('/places/tabs/offers')
         });
     })
+  }
+
+  onLocationPicked(locationReceived: PlaceLocation) {
+    this.form.patchValue({location: locationReceived})
   }
 
 }
