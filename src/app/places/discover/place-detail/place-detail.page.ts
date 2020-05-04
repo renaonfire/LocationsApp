@@ -31,6 +31,34 @@ export class PlaceDetailPage implements OnInit, OnDestroy {
     private alertCtrl: AlertController,
     private router: Router
     ) { }
+
+    ngOnInit() {
+      this.route.paramMap.subscribe(paramMap => {
+        if (!paramMap.has('placeId')) {
+          this.navCtrl.navigateBack('places/tabs/discover');
+          return;
+        }
+        this.isLoading = true;
+        this.placeSub = this.placesSrv
+          .getPlace(paramMap.get('placeId'))
+          .subscribe(
+            place => {
+              this.place = place;
+              this.isBookable = place.userId !== this.authSrv.userId;
+              this.isLoading = false;
+        }, error => {
+          this.alertCtrl.create({
+            header: 'Whoops',
+            message: 'Something went wrong',
+            buttons: [{text: 'Okay', handler: () => {
+              this.router.navigateByUrl('/places/tabs/discover');
+            }}]
+          }).then(alertEl => 
+            alertEl.present());
+        })
+      });
+    }
+  
     
     onBookPlace() {
       this.actionSheetCtrl.create({
@@ -85,31 +113,6 @@ export class PlaceDetailPage implements OnInit, OnDestroy {
         })
       })
     }
-
-  ngOnInit() {
-    this.route.paramMap.subscribe(paramMap => {
-      if (!paramMap.has('placeId')) {
-        this.navCtrl.navigateBack('places/discover');
-        return;
-      }
-      this.isLoading = true;
-      this.placeSub = this.placesSrv.getPlace(paramMap.get('placeId')).subscribe(place => {
-        this.isLoading = false;
-        this.place = place;
-        this.isBookable = place.userId !== this.authSrv.userId;
-      }, error => {
-        this.alertCtrl.create({
-          header: 'Whoops',
-          message: 'Something went wrong',
-          buttons: [{text: 'Okay', handler: () => {
-            this.router.navigateByUrl('/places/tabs/discover');
-          }}]
-        }).then(alertEl => {
-          alertEl.present();
-        })
-      })
-    });
-  }
 
   ngOnDestroy() {
     if (this.placeSub) {

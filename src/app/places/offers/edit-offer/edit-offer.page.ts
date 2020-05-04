@@ -5,6 +5,7 @@ import { PlacesService } from '../../places.service';
 import { NavController, LoadingController, AlertController } from '@ionic/angular';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { Subscription } from 'rxjs';
+import { PlaceLocation } from '../../location.model';
 
 @Component({
   selector: 'app-edit-offer',
@@ -40,7 +41,8 @@ export class EditOfferPage implements OnInit, OnDestroy {
         this.place.id, 
         this.form.value.title, 
         this.form.value.description, 
-        this.form.value.img
+        this.form.value.img,
+        this.form.value.location
         ).subscribe(() => {
           loadingEl.dismiss();
           this.form.reset();
@@ -61,8 +63,7 @@ export class EditOfferPage implements OnInit, OnDestroy {
         this.place = place;
         this.form = new FormGroup({
           title: new FormControl(this.place.title, {
-            updateOn: 'blur',
-            validators: [Validators.maxLength(40)]
+            updateOn: 'blur'
           }), 
           description: new FormControl(this.place.description, {
             updateOn: 'blur'
@@ -77,6 +78,9 @@ export class EditOfferPage implements OnInit, OnDestroy {
             updateOn: 'blur'
           }),
           img: new FormControl(this.place.img, {
+            updateOn: 'blur'
+          }),
+          location: new FormControl(this.place.location, {
             updateOn: 'blur'
           })
         });
@@ -93,6 +97,10 @@ export class EditOfferPage implements OnInit, OnDestroy {
         })
       });
     });
+  }
+
+  onLocationPicked(locationReceived: PlaceLocation) {
+    this.form.patchValue({location: locationReceived})
   }
 
   ngOnDestroy() {

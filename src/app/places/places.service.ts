@@ -104,7 +104,7 @@ export class PlacesService {
       // }));
   }
 
-  updatePlace(placeId: string, title: string, description: string, img: string) {
+  updatePlace(placeId: string, title: string, description: string, img: string, location: PlaceLocation) {
     let updatedPlaces: Places[];
     return this.places.pipe(
       take(1), 
@@ -128,7 +128,7 @@ export class PlacesService {
             oldPlace.availableFrom, 
             oldPlace.availableTo, 
             oldPlace.userId,
-            oldPlace.location
+            location
             );
             return this.http.put(`https://locationsapp-73201.firebaseio.com/offered-places/${placeId}.json`, 
             { ...updatedPlaces[updatedPlaceIndex], id: null }
